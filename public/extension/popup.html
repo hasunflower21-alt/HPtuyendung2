@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoRecruit FB - All-in-One Extension</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { width: 440px; background: #0f172a; color: #f8fafc; padding: 14px; font-size: 12px; line-height: 1.4; }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+    .brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; color: #38bdf8; }
+    .badge { background: #0284c7; color: white; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 999px; }
+
+    /* Tabs */
+    .tab-bar { display: flex; gap: 4px; background: #1e293b; padding: 3px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; }
+    .tab-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: 700; background: transparent; border: none; color: #94a3b8; border-radius: 7px; cursor: pointer; text-align: center; transition: 0.15s; }
+    .tab-btn.active { background: #0284c7; color: white; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Card */
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .card-title { font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+    label { font-size: 11px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 4px; }
+    select, input[type="text"], input[type="number"], textarea {
+      width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 11px; padding: 7px 9px; outline: none; transition: border-color 0.2s;
+    }
+    select:focus, input:focus, textarea:focus { border-color: #38bdf8; }
+    textarea { height: 80px; resize: vertical; font-family: inherit; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
+    .btn-sub {
+      background: #334155; color: #e2e8f0; font-size: 11px; font-weight: 600; border: none; border-radius: 6px; padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.15s;
+    }
+    .btn-sub:hover { background: #475569; color: white; }
+    .btn-sub-primary { background: #0284c7; color: white; }
+    .btn-sub-primary:hover { background: #0369a1; }
+    .btn-sub-emerald { background: #059669; color: white; }
+    .btn-sub-emerald:hover { background: #047857; }
+    .btn-sub-amber { background: #d97706; color: white; }
+    .btn-sub-amber:hover { background: #b45309; }
+    .btn-sub-danger { background: #be123c; color: white; }
+    .btn-sub-danger:hover { background: #9f1239; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #cbd5e1; }
+    .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #0284c7; cursor: pointer; }
+
+    /* Image Preview Box */
+    .image-box { display: flex; gap: 10px; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-top: 6px; }
+    .image-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid #475569; background: #1e293b; }
+
+    /* Group Box */
+    .group-box { max-height: 115px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px; font-size: 10px; }
+    .group-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+    .group-item:last-child { border-bottom: none; }
+    .group-link { color: #38bdf8; text-decoration: none; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Schedule time tags */
+    .time-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .time-tag { background: #0f172a; border: 1px solid #0284c7; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
+    .time-tag .del-time { cursor: pointer; color: #ef4444; margin-left: 4px; }
+
+    /* Action Buttons */
+    .btn-primary {
+      width: 100%; background: linear-gradient(135deg, #f59e0b, #ea580c); color: #0f172a; font-weight: 900; font-size: 13px; border: none; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); transition: 0.2s; margin-top: 6px;
+    }
+    .btn-primary:hover { opacity: 0.95; transform: scale(1.01); }
+    .btn-stop {
+      width: 100%; background: #e11d48; color: white; font-weight: bold; font-size: 12px; border: none; border-radius: 10px; padding: 10px; cursor: pointer; margin-top: 8px; display: none;
+    }
+
+    .progress-box { display: none; margin-top: 10px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 10px; padding: 10px; }
+    .progress-bar-bg { width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; margin-top: 8px; }
+    .progress-bar-fill { width: 0%; height: 100%; background: #38bdf8; transition: width 0.3s; }
+    .status-text { font-size: 11px; color: #cbd5e1; font-weight: 600; }
+
+    .toast-msg { display: none; padding: 6px 10px; background: #065f46; color: #a7f3d0; border-radius: 6px; font-size: 11px; margin-bottom: 8px; font-weight: 500; }
+
+    /* Live Preview Box */
+    .preview-box { background: #0a0f1d; border: 1px dashed #38bdf8; border-radius: 8px; padding: 8px; font-size: 10.5px; color: #cbd5e1; margin-top: 8px; line-height: 1.4; white-space: pre-wrap; max-height: 75px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <span>⚡ AutoRecruit FB</span>
+      <span class="badge">V1.4.0 Độc Lập</span>
+    </div>
+    <div style="display: flex; gap: 4px;">
+      <button id="btnOpenFullTab" class="btn-sub btn-sub-primary" style="font-size: 10px; padding: 3px 8px;" title="Mở trang quản trị toàn màn hình trong tab mới">
+        ⛶ Toàn Màn Hình
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast-msg"></div>
+
+  <!-- Navigation Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-content">1. Bài Viết & Ảnh</button>
+    <button class="tab-btn" data-tab="tab-schedule">2. Giờ Đăng & Giãn Cách</button>
+    <button class="tab-btn" data-tab="tab-groups">3. 20 Nhóm Nhận Bài</button>
+  </div>
+
+  <!-- TAB 1: NỘI DUNG & ẢNH TUYỂN DỤNG -->
+  <div id="tab-content" class="tab-panel active">
+    <div class="card">
+      <div class="card-title">
+        <span>Bài Viết Tuyển Dụng (Độc Lập 100%)</span>
+        <div style="display: flex; gap: 4px;">
+          <button class="btn-sub btn-sub-emerald" id="btnSaveCurrentPost" style="padding: 2px 7px; font-size: 10px;" title="Lưu bài viết vào bộ nhớ Extension">
+            💾 Lưu Bài
+          </button>
+          <button class="btn-sub btn-sub-primary" id="btnAddNewPost" style="padding: 2px 7px; font-size: 10px;">
+            ➕ Tạo Bài Mới
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+        <select id="postSelector" style="flex: 1;">
+          <!-- Filled by JS -->
+        </select>
+        <button class="btn-sub btn-sub-danger" id="btnDeleteCurrentPost" style="padding: 2px 7px; font-size: 10px;" title="Xóa bài viết này">
+          🗑️
+        </button>
+      </div>
+
+      <div style="margin-bottom: 6px;">
+        <label for="postTitleInput">Tiêu đề bài viết:</label>
+        <input type="text" id="postTitleInput" placeholder="Ví dụ: CÔNG TY CP HOA PHƯỢNG ME - TUYỂN DỤNG..." />
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <label for="postContent" style="margin: 0;">Nội dung bài viết (sẽ đăng lên Facebook):</label>
+        <button id="btnAutoSpintax" class="btn-sub btn-sub-amber" style="padding: 2px 7px; font-size: 10px;" title="Tự động thêm biến thể từ ngữ vào các câu tuyển dụng">
+          ⚡ Đảo Chữ (Spintax)
+        </button>
+      </div>
+      <textarea id="postContent" placeholder="Nhập nội dung tuyển dụng chi tiết..."></textarea>
+
+      <!-- Tùy chọn Tự đảo nội dung -->
+      <div class="toggle-row">
+        <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" id="enableSpintax" checked>
+          <span><strong>Tự động đảo Spintax:</strong> Mỗi nhóm là 1 bản văn khác nhau (Chống spam)</span>
+        </label>
+      </div>
+
+      <!-- Xem trước biến thể -->
+      <div style="margin-top: 8px;">
+        <div style="font-size: 10px; font-weight: bold; color: #94a3b8; display: flex; justify-content: space-between;">
+          <span>Xem Trước Bản Văn Đăng Vào Nhóm 1:</span>
+          <span style="color: #f59e0b; cursor: pointer;" id="btnRerollPreview">🎲 Đổi biến thể</span>
+        </div>
+        <div class="preview-box" id="previewBox">Nội dung xem trước...</div>
+      </div>
+    </div>
+
+    <!-- MỤC ĐÍNH KÈM ẢNH TƯƠNG TÁC (TỐI ĐA 3 ẢNH) -->
+    <div class="card">
+      <div class="card-title">
+        <span>Bộ 3 Ảnh Tương Tác Kèm Theo (Tối Đa 3 Ảnh)</span>
+        <span id="imageStatusBadge" style="color: #38bdf8; font-weight: bold;">0/3 ảnh</span>
+      </div>
+
+      <div class="toggle-row" style="margin-top: 0; margin-bottom: 6px;">
+        <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" id="enableAttachImage" checked>
+          <span><strong>Đính kèm tối đa 3 ảnh tương tác</strong> (Tự điều chỉnh hiển thị Facebook)</span>
+        </label>
+      </div>
+
+      <!-- 3 Slots Thumbnail Grid -->
+      <div id="imageSettingsArea">
+        <div id="popupImageSlots" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+          <!-- Slot 1 -->
+          <div class="popup-img-slot" id="slot1" style="height: 75px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="thumb1" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="label1" style="font-size: 9px; color: #64748b;">Ảnh 1 (Chính)</span>
+            <button type="button" class="del-slot-btn" data-slot="0" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 4px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+          <!-- Slot 2 -->
+          <div class="popup-img-slot" id="slot2" style="height: 75px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="thumb2" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="label2" style="font-size: 9px; color: #64748b;">Ảnh 2</span>
+            <button type="button" class="del-slot-btn" data-slot="1" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 4px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+          <!-- Slot 3 -->
+          <div class="popup-img-slot" id="slot3" style="height: 75px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="thumb3" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="label3" style="font-size: 9px; color: #64748b;">Ảnh 3</span>
+            <button type="button" class="del-slot-btn" data-slot="2" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 4px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+          <button class="btn-sub btn-sub-emerald" id="btnPickLocalFile" style="flex: 1; justify-content: center; font-size: 10.5px;">
+            📁 Chọn Tối Đa 3 Ảnh Từ Máy Tính
+          </button>
+          <input type="file" id="localImagePicker" accept="image/*" multiple style="display: none;" />
+          <button class="btn-sub" id="btnClearAllImages" style="padding: 2px 8px; font-size: 10px; color: #f43f5e;" title="Xóa tất cả ảnh">
+            Xóa hết ảnh
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 4px;">
+          <input type="text" id="imageUrlInput" placeholder="Dán link ảnh: https://..." style="font-size: 10px; padding: 4px 6px; flex: 1;" />
+          <button class="btn-sub btn-sub-primary" id="btnAddImageUrl" style="font-size: 10px; padding: 4px 8px;">+ Thêm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: CÀI ĐẶT THỜI GIAN & HẸN GIỜ ĐĂNG -->
+  <div id="tab-schedule" class="tab-panel">
+    <div class="card">
+      <div class="card-title">
+        <span>Cài Đặt Giờ Đăng & Giãn Cách An Toàn</span>
+        <span style="color: #38bdf8;">Chống Khóa Nick</span>
+      </div>
+
+      <div style="margin-bottom: 10px;">
+        <label>1. Giãn cách nghỉ giữa 2 nhóm liên tiếp:</label>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" id="delayInput" value="20" min="10" max="120" style="width: 60px; text-align: center;">
+          <span style="color: #94a3b8;">giây (Khuyên dùng: 20s - 45s)</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px;">
+        <label>2. Khung Giờ Đăng Tự Động Trong Ngày (Giờ Vàng):</label>
+        <div class="time-tags" id="timeTagsContainer">
+          <!-- Filled by JS -->
+        </div>
+
+        <div class="btn-row" style="margin-top: 8px;">
+          <input type="text" id="newTimeInput" placeholder="VD: 14:00" style="width: 80px; text-align: center; font-size: 11px;">
+          <button class="btn-sub btn-sub-primary" id="btnAddTime">➕ Thêm Giờ</button>
+          <button class="btn-sub" id="btnResetGoldenHours">⭐ Giờ Vàng (4 Mốc)</button>
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="enableScheduleAuto">
+            <span><strong>Kích hoạt hẹn giờ tự động:</strong> Tự chạy khi đến giờ</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: 20 NHÓM NHẬN BÀI -->
+  <div id="tab-groups" class="tab-panel">
+    <div class="card">
+      <div class="card-title">
+        <span>20 Nhóm Tuyển Dụng Nhận Bài</span>
+        <span id="groupCountBadge" style="color: #38bdf8; font-weight: bold;">21 Nhóm</span>
+      </div>
+
+      <div class="group-box" id="groupBox">
+        <!-- Generated by JS -->
+      </div>
+
+      <!-- Tùy chọn trộn thứ tự nhóm -->
+      <div class="toggle-row" style="margin-top: 8px; margin-bottom: 4px;">
+        <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" id="shuffleGroupsToggle" checked>
+          <span><strong>🎲 Trộn ngẫu nhiên mỗi lượt đăng:</strong> Tránh mỗi lần chạy lại đăng mãi nhóm đầu</span>
+        </label>
+      </div>
+
+      <div class="btn-row" style="margin-top: 6px;">
+        <button class="btn-sub btn-sub-amber" id="btnShuffleGroupsNow" style="flex: 1; justify-content: center;" title="Trộn ngẫu nhiên vị trí các nhóm ngay">
+          <span>🎲 Xáo Trộn Ngay</span>
+        </button>
+        <button class="btn-sub btn-sub-primary" id="btnEditGroups" style="flex: 1; justify-content: center;">
+          <span>✏️ Sửa Danh Sách</span>
+        </button>
+      </div>
+
+      <!-- Hidden Edit Area -->
+      <div id="editGroupArea" style="display: none; margin-top: 8px;">
+        <label for="groupLinksInput">Dán danh sách link nhóm Facebook của bạn (mỗi dòng 1 link):</label>
+        <textarea id="groupLinksInput" style="height: 90px;" placeholder="https://www.facebook.com/groups/123456789/&#10;https://www.facebook.com/groups/tuyendungvieclam/"></textarea>
+        <div class="btn-row">
+          <button class="btn-sub btn-sub-primary" id="btnSaveGroupLinks">💾 Lưu Danh Sách Nhóm</button>
+          <button class="btn-sub" id="btnCancelEditGroups">Hủy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NÚT BẮT ĐẦU CHẠY -->
+  <button class="btn-primary" id="startBtn">
+    <span>⚡ BẮT ĐẦU ĐĂNG TỰ ĐỘNG 20 NHÓM NGAY</span>
+  </button>
+
+  <button class="btn-stop" id="stopBtn">
+    <span>⏹️ DỪNG TIẾN TRÌNH LẠI</span>
+  </button>
+
+  <!-- Tiến trình đang chạy -->
+  <div class="progress-box" id="progressBox">
+    <div class="status-text" id="statusText">Đang chuẩn bị...</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <div style="font-size: 10px; color: #64748b; text-align: center; margin-top: 8px;">
+    Độc Lập 100% • Tải Ảnh Từ Máy • Đăng Đúng 1 Lần Không Lặp Chữ • Chống Khóa Nick
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

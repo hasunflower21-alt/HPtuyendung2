@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoRecruit FB - Bảng Điều Khiển Toàn Diện (All-In-One)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: #090d16; color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Top Nav */
+    header {
+      background: #0f172a; border-bottom: 1px solid #1e293b; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 900; color: #38bdf8; }
+    .badge { background: #0284c7; color: white; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 999px; }
+
+    /* Layout Grid */
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; flex: 1; width: 100%; display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 20px; }
+    @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
+
+    .card { background: #131d31; border: 1px solid #22324f; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 12px; }
+    .card-title { font-size: 13px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    label { font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 5px; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; background: #0a0f1d; border: 1px solid #2b3d60; border-radius: 8px; color: #f8fafc; font-size: 12.5px; padding: 9px 12px; outline: none; transition: 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+    textarea { height: 160px; line-height: 1.5; resize: vertical; }
+
+    .btn {
+      padding: 8px 14px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.15s;
+    }
+    .btn-primary { background: #0284c7; color: white; }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-emerald { background: #059669; color: white; }
+    .btn-emerald:hover { background: #047857; }
+    .btn-amber { background: #d97706; color: white; }
+    .btn-amber:hover { background: #b45309; }
+    .btn-danger { background: #e11d48; color: white; }
+    .btn-danger:hover { background: #be123c; }
+    .btn-sub { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+    .btn-sub:hover { background: #334155; color: white; }
+
+    .btn-big-run {
+      background: linear-gradient(135deg, #f59e0b, #ea580c); color: #090d16; font-size: 14px; font-weight: 900; padding: 14px; width: 100%; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-big-run:hover { transform: scale(1.01); filter: brightness(1.1); }
+
+    /* Groups list */
+    .group-list { max-height: 380px; overflow-y: auto; background: #0a0f1d; border: 1px solid #22324f; border-radius: 10px; padding: 8px; }
+    .group-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #141e33; font-size: 12px; }
+    .group-item:last-child { border-bottom: none; }
+    .group-name { font-weight: 600; color: #e2e8f0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Time tags */
+    .time-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .time-tag { background: #090d16; border: 1px solid #0284c7; color: #38bdf8; font-size: 12px; font-weight: 800; padding: 5px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; }
+    .time-tag span.del { cursor: pointer; color: #ef4444; font-weight: bold; }
+
+    /* Preview box */
+    .mockup-box { background: #090d16; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .mockup-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #334155; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #065f46; border: 1px solid #10b981; color: #d1fae5; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <span>⚡ AutoRecruit FB</span>
+      <span class="badge">Bảng Điều Khiển Độc Lập</span>
+    </div>
+    <div style="font-size: 12px; color: #10b981; font-weight: 700;">
+      ● Tiện ích hoạt động 100% trong Chrome (Không cần Web App)
+    </div>
+  </header>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Main Grid -->
+  <div class="container">
+    <!-- CỘT 1: SOẠN BÀI VIẾT & CHỌN ẢNH -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">1. Bài Viết & Ảnh Tuyển Dụng</span>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-emerald" id="btnSavePost">💾 Lưu Bài</button>
+          <button class="btn btn-primary" id="btnNewPost">➕ Thêm Mới</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <select id="postSelect" style="flex: 1;"></select>
+        <button class="btn btn-danger" id="btnDeletePost" title="Xóa bài viết này">🗑️</button>
+      </div>
+
+      <div>
+        <label>Tiêu đề bài viết:</label>
+        <input type="text" id="postTitle" placeholder="Tiêu đề..." />
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <label style="margin: 0;">Nội dung bài viết tuyển dụng:</label>
+          <button class="btn btn-amber" id="btnSpintax" style="padding: 4px 8px; font-size: 11px;">⚡ Tự Đảo Spintax {A|B|C}</button>
+        </div>
+        <textarea id="postContent" placeholder="Nhập nội dung tuyển dụng..."></textarea>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <label style="margin: 0;">Bộ 3 ảnh tương tác kèm theo (Tối đa 3 ảnh):</label>
+          <span id="dashImageBadge" style="color: #38bdf8; font-weight: bold; font-size: 11px;">0/3 ảnh</span>
+        </div>
+
+        <!-- 3 Slots Thumbnail Grid -->
+        <div id="dashImageSlots" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+          <div class="dash-slot" id="dashSlot1" style="height: 80px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="dashThumb1" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="dashLabel1" style="font-size: 10px; color: #64748b;">Ảnh 1 (Chính)</span>
+            <button type="button" class="dash-del-btn" data-slot="0" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 5px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+          <div class="dash-slot" id="dashSlot2" style="height: 80px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="dashThumb2" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="dashLabel2" style="font-size: 10px; color: #64748b;">Ảnh 2</span>
+            <button type="button" class="dash-del-btn" data-slot="1" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 5px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+          <div class="dash-slot" id="dashSlot3" style="height: 80px; background: #0f172a; border: 1px dashed #475569; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img id="dashThumb3" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <span id="dashLabel3" style="font-size: 10px; color: #64748b;">Ảnh 3</span>
+            <button type="button" class="dash-del-btn" data-slot="2" style="display: none; position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: #f43f5e; border: none; border-radius: 4px; padding: 2px 5px; font-size: 9px; cursor: pointer;">✕</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <button class="btn btn-emerald" id="btnPickFile" style="flex: 1;">
+            📁 Chọn Tối Đa 3 Ảnh Từ Máy Tính
+          </button>
+          <input type="file" id="filePicker" accept="image/*" multiple style="display: none;" />
+          <button class="btn" id="btnClearDashImages" style="color: #f43f5e; font-size: 11px;">Xóa hết ảnh</button>
+        </div>
+
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="postImageUrl" placeholder="Hoặc dán link ảnh: https://..." style="flex: 1;" />
+          <button class="btn btn-primary" id="btnAddDashImageUrl" style="font-size: 11px; padding: 6px 12px;">+ Thêm</button>
+        </div>
+      </div>
+
+      <!-- Xem trước -->
+      <div class="mockup-box">
+        <div style="font-size: 11px; font-weight: bold; color: #94a3b8; display: flex; justify-content: space-between;">
+          <span>Xem Trước Trên Facebook (Đã Đảo Chữ & 3 Ảnh):</span>
+          <span style="color: #f59e0b; cursor: pointer;" id="btnRandomPreview">🎲 Thử biến thể khác</span>
+        </div>
+        <div id="previewText" style="font-size: 12px; line-height: 1.5; white-space: pre-wrap; max-height: 100px; overflow-y: auto; color: #cbd5e1; margin-top: 6px;"></div>
+        <div id="previewImagesGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- CỘT 2: QUẢN LÝ 20 NHÓM FACEBOOK -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">2. Danh Sách 20 Nhóm Facebook</span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button class="btn btn-amber" id="btnShuffleDashboardGroups" style="padding: 3px 8px; font-size: 11px;">🎲 Trộn Thứ Tự</button>
+          <span id="groupTotalBadge" style="color: #38bdf8; font-weight: bold; font-size: 12px;">21 Nhóm</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <input type="text" id="newGroupName" placeholder="Tên nhóm (VD: Việc làm Hà Nội)" style="flex: 1;" />
+        <input type="text" id="newGroupLink" placeholder="Link nhóm Facebook (https://...)" style="flex: 1.3;" />
+        <button class="btn btn-primary" id="btnAddGroup">➕ Thêm</button>
+      </div>
+
+      <div class="group-list" id="groupList">
+        <!-- Filled by JS -->
+      </div>
+
+      <div>
+        <label>Hoặc Dán Hàng Loạt Link Nhóm (Mỗi dòng 1 link):</label>
+        <textarea id="bulkLinksInput" style="height: 100px;" placeholder="https://www.facebook.com/groups/123&#10;https://www.facebook.com/groups/456"></textarea>
+        <button class="btn btn-primary" id="btnSaveBulkLinks" style="width: 100%; margin-top: 6px;">
+          💾 Lưu Hàng Loạt Link Nhóm
+        </button>
+      </div>
+    </div>
+
+    <!-- CỘT 3: CÀI ĐẶT & ĐĂNG BÀI LIÊN HOÀN -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">3. Tiến Trình & Hẹn Giờ Đăng</span>
+        <span style="color: #10b981; font-weight: bold; font-size: 12px;">Chống Khóa Nick</span>
+      </div>
+
+      <div>
+        <label>Giãn cách nghỉ an toàn giữa 2 nhóm liên tiếp:</label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="number" id="delayInput" value="20" min="10" max="120" style="width: 70px; text-align: center;" />
+          <span style="font-size: 12px; color: #94a3b8;">giây (Khuyên dùng: 20s - 45s)</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #1e293b; padding-top: 12px;">
+        <label>Khung Giờ Đăng Tự Động Trong Ngày:</label>
+        <div class="time-tags" id="timeTagsContainer"></div>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <input type="text" id="timeInput" placeholder="VD: 14:00" style="width: 90px; text-align: center;" />
+          <button class="btn btn-primary" id="btnAddTime">➕ Thêm</button>
+          <button class="btn btn-sub" id="btnGoldenHours">⭐ Giờ Vàng</button>
+        </div>
+        <div style="margin-top: 10px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="scheduleToggle" style="width: 16px; height: 16px; accent-color: #0284c7;" />
+            <span>Kích hoạt tự động đăng khi đến giờ</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div style="margin-top: auto; border-top: 1px solid #1e293b; padding-top: 16px;">
+        <button class="btn-big-run" id="btnStartRun">
+          <span>⚡ BẮT ĐẦU ĐĂNG NGAY 20 NHÓM</span>
+        </button>
+        <button class="btn btn-danger" id="btnStopRun" style="width: 100%; padding: 12px; margin-top: 8px; display: none;">
+          ⏹️ DỪNG TIẾN TRÌNH LẠI
+        </button>
+
+        <div id="progressArea" style="display: none; margin-top: 14px; background: #0a0f1d; border: 1px solid #0284c7; border-radius: 10px; padding: 12px;">
+          <div id="statusLabel" style="font-size: 12px; font-weight: bold; color: #38bdf8;">Đang chuẩn bị...</div>
+          <div style="width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 8px;">
+            <div id="progressBar" style="width: 0%; height: 100%; background: #38bdf8; transition: width 0.3s;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "Remix AutoRecruit FB - Tự Động Đăng Bài Tuyển Dụng Facebook 2 Lần/Ngày",
+  "description": "Hệ thống tự động hóa 100% đăng tin tuyển dụng lên 20+ nhóm Facebook đã tham gia 2 lần mỗi ngày kèm nội dung soạn sẵn, hình ảnh, cơ chế chống chặn spam và báo cáo chi tiết.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

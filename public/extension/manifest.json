@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "AutoRecruit FB - Tự Động Đăng 20 Nhóm (All-In-One)",
+  "version": "1.4.0",
+  "description": "Tiện ích độc lập 100%: Quản lý bài viết, tải ảnh từ máy tính, quản lý 20 nhóm Facebook, tự đảo Spintax và hẹn giờ đăng tự động.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://*.facebook.com/*",
+    "https://facebook.com/*",
+    "*://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/*",
+        "https://facebook.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://dang-bai-fb.pages.dev/*",
+        "*://*.pages.dev/*",
+        "*://*.run.app/*",
+        "http://localhost/*",
+        "https://localhost/*"
+      ],
+      "js": ["web_bridge.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "options_page": "dashboard.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "dashboard.html",
+        "dashboard.js",
+        "icon.png",
+        "preloaded_data.json"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
